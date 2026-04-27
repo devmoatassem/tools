@@ -283,8 +283,8 @@
         thead th:last-child {
             text-align: right;
         }
-        thead th:nth-child(3),
-        thead th:nth-child(4) {
+        thead th:nth-child(2),
+        thead th:nth-child(3) {
             text-align: center;
             width: 100px;
         }
@@ -320,12 +320,14 @@
             box-shadow: 0 0 0 3px rgba(203, 213, 225, 0.2);
         }
         tbody td input.input-hours,
-        tbody td input.input-rate {
+        tbody td input.input-rate,
+        tbody td input.input-amount {
             text-align: center;
             font-family: var(--font-mono);
             font-weight: 500;
         }
-        tbody td .amount-display {
+        tbody td .amount-display,
+        tbody td .hours-display {
             text-align: right;
             font-family: var(--font-mono);
             font-weight: 600;
@@ -622,9 +624,9 @@
                     <thead>
                         <tr>
                             <th style="width:40%;">Description</th>
-                            <th style="width:15%;text-align:center;">Hours</th>
+                            <th style="width:18%;text-align:center;">Amount</th>
                             <th style="width:18%;text-align:center;">Hourly Rate</th>
-                            <th style="width:18%;text-align:right;">Amount</th>
+                            <th style="width:15%;text-align:right;">Hours</th>
                             <th style="width:9%;"></th>
                         </tr>
                     </thead>
@@ -698,7 +700,7 @@
 
                 // Recalculate on any relevant input change (delegation)
                 document.getElementById('lineItemsBody').addEventListener('input', function(e) {
-                    if (e.target.classList.contains('input-hours') ||
+                    if (e.target.classList.contains('input-amount') ||
                         e.target.classList.contains('input-rate') ||
                         e.target.classList.contains('input-desc')) {
                         recalcAll();
@@ -731,7 +733,7 @@
                 const item = {
                     id: id,
                     description: '',
-                    hours: 0,
+                    amount: 0,
                     rate: defaultRate,
                 };
 
@@ -806,9 +808,9 @@
                                placeholder="e.g. Web design, consultation, content writing...">
                     </td>
                     <td style="text-align:center;">
-                        <input type="number" class="input-hours" id="hours-${item.id}" 
-                               value="${item.hours}" min="0" step="0.25" 
-                               placeholder="0.00" style="width:80px;">
+                        <input type="number" class="input-amount" id="amount-${item.id}" 
+                               value="${item.amount}" min="0" step="0.01" 
+                               placeholder="0.00" style="width:90px;">
                     </td>
                     <td style="text-align:center;">
                         <input type="number" class="input-rate" id="rate-${item.id}" 
@@ -816,7 +818,7 @@
                                placeholder="0.00" style="width:90px;">
                     </td>
                     <td style="text-align:right;">
-                        <span class="amount-display" id="amount-${item.id}">$0.00</span>
+                        <span class="hours-display" id="hours-${item.id}">0:00</span>
                     </td>
                     <td style="text-align:center;">
                         <button class="btn-remove-row" onclick="removeRow(${item.id}, this)" 
@@ -828,11 +830,11 @@
                 tbody.appendChild(tr);
 
                 // Wire up input listeners for this row
-                const hoursInput = tr.querySelector('.input-hours');
+                const amountInput = tr.querySelector('.input-amount');
                 const rateInput = tr.querySelector('.input-rate');
                 const descInput = tr.querySelector('.input-desc');
 
-                hoursInput.addEventListener('input', function() {
+                amountInput.addEventListener('input', function() {
                     updateItemFromDOM(item.id);
                     recalcAll();
                 });
@@ -850,18 +852,18 @@
                 if (!item) return;
 
                 const descInput = document.getElementById(`desc-${id}`);
-                const hoursInput = document.getElementById(`hours-${id}`);
+                const amountInput = document.getElementById(`amount-${id}`);
                 const rateInput = document.getElementById(`rate-${id}`);
 
                 if (descInput) item.description = descInput.value;
-                if (hoursInput) item.hours = parseFloat(hoursInput.value) || 0;
+                if (amountInput) item.amount = parseFloat(amountInput.value) || 0;
                 if (rateInput) item.rate = parseFloat(rateInput.value) || 0;
 
-                // Update the amount display for this row
-                const amountDisplay = document.getElementById(`amount-${id}`);
-                if (amountDisplay) {
-                    const amt = item.hours * item.rate;
-                    amountDisplay.textContent = formatCurrency(amt);
+                // Update the hours display for this row
+                const hoursDisplay = document.getElementById(`hours-${id}`);
+                if (hoursDisplay) {
+                    const hrs = item.rate > 0 ? item.amount / item.rate : 0;
+                    hoursDisplay.textContent = formatHours(hrs);
                 }
             }
 
@@ -872,7 +874,7 @@
                 // Calculate totals
                 let subtotal = 0;
                 lineItems.forEach(item => {
-                    subtotal += item.hours * item.rate;
+                    subtotal += item.amount;
                 });
 
                 const taxRate = 0; // 0% tax (can be adjusted)
@@ -883,17 +885,24 @@
                 document.getElementById('taxDisplay').textContent = formatCurrency(tax);
                 document.getElementById('grandTotalDisplay').textContent = formatCurrency(grandTotal);
 
-                // Update all individual amount displays
+                // Update all individual hours displays
                 lineItems.forEach(item => {
-                    const amountDisplay = document.getElementById(`amount-${item.id}`);
-                    if (amountDisplay) {
-                        amountDisplay.textContent = formatCurrency(item.hours * item.rate);
+                    const hoursDisplay = document.getElementById(`hours-${item.id}`);
+                    if (hoursDisplay) {
+                        const hrs = item.rate > 0 ? item.amount / item.rate : 0;
+                        hoursDisplay.textContent = formatHours(hrs);
                     }
                 });
             }
 
             function formatCurrency(amount) {
                 return '$' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            function formatHours(decimalHours) {
+                const hours = Math.floor(decimalHours);
+                const minutes = Math.round((decimalHours - hours) * 60);
+                return `${hours}:${minutes.toString().padStart(2, '0')}`;
             }
 
             function escapeHTML(str) {
