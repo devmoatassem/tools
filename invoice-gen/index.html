@@ -302,7 +302,8 @@
         tbody tr:last-child td {
             border-bottom: none;
         }
-        tbody td input {
+        tbody td input,
+        tbody td textarea {
             width: 100%;
             border: 1px solid transparent;
             background: transparent;
@@ -314,7 +315,8 @@
             outline: none;
             transition: all 0.15s;
         }
-        tbody td input:focus {
+        tbody td input:focus,
+        tbody td textarea:focus {
             border-color: #cbd5e1;
             background: #fff;
             box-shadow: 0 0 0 3px rgba(203, 213, 225, 0.2);
@@ -481,10 +483,12 @@
             .address-block input,
             .address-block textarea,
             .meta-item input,
-            tbody td input {
+            tbody td input,
+            tbody td textarea {
                 border-bottom: none !important;
             }
-            tbody td input:focus {
+            tbody td input:focus,
+            tbody td textarea:focus {
                 border-color: transparent;
                 box-shadow: none;
                 background: transparent;
@@ -803,9 +807,8 @@
                 tr.setAttribute('data-item-id', item.id);
                 tr.innerHTML = `
                     <td>
-                        <input type="text" class="input-desc" id="desc-${item.id}" 
-                               value="${escapeHTML(item.description)}" 
-                               placeholder="e.g. Web design, consultation, content writing...">
+                        <textarea class="input-desc" id="desc-${item.id}" rows="2" 
+                               placeholder="e.g. Web design, consultation, content writing...">${escapeHTML(item.description)}</textarea>
                     </td>
                     <td style="text-align:center;">
                         <input type="number" class="input-amount" id="amount-${item.id}" 
