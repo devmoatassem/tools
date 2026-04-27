@@ -658,13 +658,13 @@
             <!-- Notes -->
             <div class="notes-section">
                 <label>Notes / Payment Instructions</label>
-                <textarea id="notesArea" placeholder="Thank you for your business! Please make payment via bank transfer or check.&#10;Bank: Chase | Account: ****1234 | Routing: 021000021">Thank you for your business! Please make payment via bank transfer or check.
-                    Bank: Chase | Account: ****1234 | Routing: 021000021</textarea>
+                <textarea id="notesArea" >Thank you for your business! Please make the payment via ACH transfer using the shared account details.
+                </textarea>
                 </div>
 
                 <!-- Footer -->
                 <div class="invoice-footer">
-                    This invoice was generated for <strong id="footerName">Alex Morgan</strong> — Full stack web developer
+                    This invoice was generated for <strong id="footerName">Moatassem Billah</strong> — Full stack web developer
                 </div>
             </div>
         </div>
@@ -726,7 +726,7 @@
             function addRow(silent = false) {
                 itemIdCounter++;
                 const id = itemIdCounter;
-                const defaultRate = 75.00; // sensible default hourly rate
+                const defaultRate = 15.00; // sensible default hourly rate
 
                 const item = {
                     id: id,
